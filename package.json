@@ -1,0 +1,35 @@
+{
+  "name": "tilix-api",
+  "version": "1.0.0",
+  "description": "API para atender ao teste solicitado pela TIlix.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node_modules/.bin/nodemon --delay 3 dist/main",
+    "gulp": "node_modules/.bin/gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://leandrocamara@bitbucket.org/leandrocamara/tilix-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/leandrocamara/tilix-api#readme",
+  "devDependencies": {
+    "@types/mongoose": "^5.2.11",
+    "@types/node": "^10.9.4",
+    "@types/restify": "^7.2.4",
+    "@types/restify-errors": "^4.3.3",
+    "cross-env": "^5.2.0",
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.4.0",
+    "gulp-typescript": "4.0.2",
+    "nodemon": "^1.18.4",
+    "typescript": "^3.0.3"
+  },
+  "dependencies": {
+    "mongoose": "^5.2.14",
+    "restify": "^7.2.1",
+    "restify-errors": "^6.1.1"
+  }
+}
