@@ -1,16 +1,19 @@
 
 import { Server } from './server/server'
+import { invoiceRouter } from './router/invoice.router'
 
 const server = new Server()
 
 // Instancia o Servidor.
-server.bootstrap([]).then(server => {
+server.bootstrap([
+  invoiceRouter
+]).then(server => {
 
-  console.log('Server is listening on: ', server.application.address())
+  console.log('Servidor inicializado em: ', server.application.address())
 
 }).catch(error => {
 
-  console.log('Server failed to start')
+  console.log('Falha ao inicializar o Servidor!')
   console.error(error)
   process.exit(1)
 

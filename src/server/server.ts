@@ -2,9 +2,9 @@
 import * as restify from 'restify'
 import * as mongoose from 'mongoose'
 
+import { Router } from '../router/router'
 import { handleError } from './error.handler'
 import { environment } from '../config/environment'
-import { mergePatchBodyParser } from './merge-patch.parser'
 
 /**
  * Classe do Servidor.
@@ -13,12 +13,22 @@ import { mergePatchBodyParser } from './merge-patch.parser'
  */
 export class Server {
 
-  application: restify.Server
+  public application: restify.Server
+
+  /**
+   * Retorna a instância do Servidor.
+   *
+   * @param routers
+   */
+  public bootstrap(routers: Router[] = []): Promise<Server>{
+    return this.initializeDb().then(() =>
+      this.initRoutes(routers).then(() => this))
+  }
 
   /**
    * Inicializa a conexão com o banco de dados (MongoDB).
    */
-  initializeDb(): Promise<mongoose.Mongoose> {
+  private initializeDb(): Promise<mongoose.Mongoose> {
     (<any> mongoose).Promise = global.Promise
     return mongoose.connect(environment.db.mongodb.url, {
       useNewUrlParser: true
@@ -27,27 +37,16 @@ export class Server {
 
   /**
    * Inicializa o Servidor e as Rotas da aplicação.
+   *
+   * @param routers
    */
-  initRoutes(routers: any[]): Promise<any>{
+  private initRoutes(routers: Router[]): Promise<any>{
     return new Promise((resolve, reject) => {
       try {
 
-        // Cria o servidor Restify
-        this.application = restify.createServer({
-          name: 'tilix-api',
-          version: '1.0.0'
-        })
-
-        // Instala plugins que serão utilizada por todas as rotas.
-        this.application.use(restify.plugins.queryParser())
-        this.application.use(restify.plugins.bodyParser())
-        this.application.use(mergePatchBodyParser)
-
-        // Routes
-        this.application.get('/tilix', ((req, resp, next) => resp.json('Hello Tilix!')))
-        /*for (let router of routers) {
-          router.applyRoutes(this.application)
-        }*/
+        this.createServer()
+        this.applyMiddlewares()
+        this.applyRoutersInServer(routers)
 
         // Define a porta em que o Servidor responderá às requisições.
         this.application.listen(environment.server.port, () => {
@@ -63,11 +62,32 @@ export class Server {
   }
 
   /**
-   * Retorna a instância do Servidor.
+   *  Cria o servidor Restify.
    */
-  bootstrap(routers: any[] = []): Promise<Server>{
-    return this.initializeDb().then(() =>
-      this.initRoutes(routers).then(() => this))
+  private createServer(): void {
+    this.application = restify.createServer({
+      name: 'tilix-api',
+      version: '1.0.0'
+    })
+  }
+
+  /**
+   * Instala plugins que serão utilizada por todas as rotas.
+   */
+  private applyMiddlewares(): void {
+    this.application.use(restify.plugins.queryParser())
+    this.application.use(restify.plugins.bodyParser())
+  }
+
+  /**
+   * Aplica as rotas ao Servidor (application).
+   *
+   * @param routers
+   */
+  private applyRoutersInServer(routers: Router[]): void {
+    for (let router of routers) {
+      router.applyRoutes(this.application)
+    }
   }
 
 }
