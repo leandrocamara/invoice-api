@@ -1,6 +1,7 @@
 
 import * as restify from 'restify'
 import * as mongoose from 'mongoose'
+import * as corsMiddleware from 'restify-cors-middleware'
 
 import { Router } from '../router/router'
 import { handleError } from './error.handler'
@@ -75,8 +76,28 @@ export class Server {
    * Instala plugins que serão utilizada por todas as rotas.
    */
   private applyMiddlewares(): void {
+
+    const cors: corsMiddleware.CorsMiddleware = this.getCors()
+
+    this.application.pre(cors.preflight)
+
+    this.application.use(cors.actual)
     this.application.use(restify.plugins.queryParser())
     this.application.use(restify.plugins.bodyParser())
+  }
+
+  /**
+   * Retorna a configuração do CORS.
+   */
+  private getCors(): corsMiddleware.CorsMiddleware {
+
+    const corsOptions: corsMiddleware.Options = {
+      origins: ['*'],
+      allowHeaders: [],
+      exposeHeaders: [],
+    }
+
+    return corsMiddleware(corsOptions)
   }
 
   /**
