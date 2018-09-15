@@ -3,6 +3,7 @@ import * as mongoose from 'mongoose'
 import { NotFoundError } from 'restify-errors'
 
 import { Router } from './router'
+import { AbstractBO } from '../business/abstract.business';
 
 /**
  * Classe que realiza operações genéricas do modelo (<D>) especificado pela classe especializa.
@@ -21,7 +22,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
    *
    * @param model
    */
-  constructor (protected model: mongoose.Model<D>) {
+  constructor (protected model: mongoose.Model<D>, protected business: AbstractBO<D>) {
     super();
     this.basePath = `/${model.collection.name}`
   }
@@ -49,57 +50,41 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
   /**
    * Retorna uma lista de documentos.
    */
-  protected findAll = (req, resp, next) => {
-    this.model.find()
-      .then(this.renderAll(resp, next))
-      .catch(next)
+  protected findAll = async (req, resp, next) => {
+    const documents = await this.business.findAll()
+    this.renderAll(documents, resp, next)
   }
 
   /**
    * Retorna o documento conforme o "id" informado.
    */
-  protected findById = (req, resp, next) => {
-    this.prepareOne(this.model.findById(req.params.id))
-      .then(this.render(resp, next))
-      .catch(next)
+  protected findById = async (req, resp, next) => {
+    const document = await this.business.findById(req.params.id)
+    this.render(document, resp, next)
   }
 
   /**
    * Salva um documento.
    */
-  protected save = (req, resp, next) => {
-    let document = new this.model(req.body)
-    document.save()
-      .then(this.render(resp, next))
-      .catch(next)
+  protected save = async (req, resp, next) => {
+    const document = await this.business.save(req.body)
+    this.render(document, resp, next)
   }
 
   /**
    * Atualiza todos os dados de um documento.
    */
-  protected update = (req, resp, next) => {
-    const options = { runValidators: true, overwrite: true }
-    this.model.updateOne({ _id: req.params.id }, { $set: req.body }, options).exec().then(result => {
-      if (result.n) {
-        return this.model.findById(req.params.id)
-      } else {
-        throw new NotFoundError('Documento não encontrado.')
-      }
-    }).then(this.render(resp, next)).catch(next)
+  protected update = async (req, resp, next) => {
+    const document = await this.business.update(req.params.id, req.body)
+    this.render(document, resp, next)
   }
 
   /**
    * Remove um documento.
    */
-  protected delete = (req, resp, next) => {
-    this.model.deleteOne({ _id: req.params.id }).exec().then((result: any) => {
-      if (result.ok) {
-        resp.send(204)
-      } else {
-        throw new NotFoundError('Documento não encontrado.')
-      }
-      return next()
-    }).catch(next)
+  protected delete = async (req, resp, next) => {
+    const result = await this.business.delete(req.params.id)
+    resp.send(204)
   }
 
 }

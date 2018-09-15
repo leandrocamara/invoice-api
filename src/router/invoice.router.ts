@@ -1,8 +1,9 @@
 
 import * as restify from 'restify'
 
-import { Invoice } from './../db/mongodb/invoice.model'
-import { ModelRouter } from './model.router';
+import { ModelRouter } from './model.router'
+import { Invoice } from '../db/mongodb/invoice.model'
+import { invoiceBO } from '../business/invoice.business'
 
 /**
  * Rotas do recurso "Invoice".
@@ -15,7 +16,7 @@ class InvoiceRouter extends ModelRouter<Invoice> {
    * Método construtor.
    */
   constructor () {
-    super(Invoice)
+    super(Invoice, invoiceBO)
   }
 
   /**

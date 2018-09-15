@@ -21,42 +21,38 @@ export abstract class Router extends EventEmitter {
   /**
    * Método genérico para renderizar o "documento" (resultante) na resposta da requisição.
    *
+   * @param document
    * @param response
    * @param next
    * @throws
    */
-  public render(response: restify.Response, next: restify.Next) {
-    return (document) => {
-
-      if (!document) {
-        throw new NotFoundError('Documento não encontrado.')
-      }
-
-      response.json(document)
-      return next()
+  public render(document: any, response: restify.Response, next: restify.Next) {
+    if (!document) {
+      throw new NotFoundError('Documento não encontrado.')
     }
+
+    response.json(document)
+    return next()
   }
 
   /**
    * Método genérico para renderizar a lista de "documentos" (resultante) na resposta da requisição.
    *
+   * @param documents
    * @param response
    * @param next
    */
-  public renderAll (response: restify.Response, next: restify.Next) {
-    return (documents: any[]) => {
-
-      if (documents) {
-        documents.forEach((document, index, array) => {
-          array[index] = document
-        })
-      } else {
-        documents = []
-      }
-
-      response.json(documents)
-      return next()
+  public renderAll (documents: any[], response: restify.Response, next: restify.Next) {
+    if (documents) {
+      documents.forEach((document, index, array) => {
+        array[index] = document
+      })
+    } else {
+      documents = []
     }
+
+    response.json(documents)
+    return next()
   }
 
 }
