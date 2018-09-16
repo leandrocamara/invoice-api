@@ -10,7 +10,7 @@ export abstract class AbstractBO<D extends mongoose.Document> {
    *
    * @param model
    */
-  constructor (protected model: mongoose.Model<D>) {}
+  constructor (public model: mongoose.Model<D>) {}
 
   /**
    * Retorna uma lista de documentos.
