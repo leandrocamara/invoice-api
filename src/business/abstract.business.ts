@@ -25,6 +25,8 @@ export abstract class AbstractBO<D extends mongoose.Document> {
 
   /**
    * Retorna o documento conforme o "id" informado.
+   *
+   * @param id
    */
   public async findById (id) {
     try {
@@ -36,8 +38,10 @@ export abstract class AbstractBO<D extends mongoose.Document> {
 
   /**
    * Salva um documento.
+   *
+   * @param data
    */
-  public save = async (data: D) => {
+  public async save (data: D) {
     try {
       const document = new this.model(data)
       return await document.save()
@@ -48,8 +52,11 @@ export abstract class AbstractBO<D extends mongoose.Document> {
 
   /**
    * Atualiza todos os dados de um documento.
+   *
+   * @param id
+   * @param data
    */
-  public update = async (id, data: D) => {
+  public async update (id, data: D) {
     try {
       const options = { runValidators: true, overwrite: true }
       await this.model.updateOne({ _id: id }, { $set: data }, options)
@@ -62,8 +69,10 @@ export abstract class AbstractBO<D extends mongoose.Document> {
 
   /**
    * Remove um documento.
+   *
+   * @param id
    */
-  public delete = async (id) => {
+  public async delete (id) {
     try {
       const result = await this.model.deleteOne({ _id: id })
       if (!result.ok) {
@@ -72,6 +81,13 @@ export abstract class AbstractBO<D extends mongoose.Document> {
     } catch (error) {
       throw new NotFoundError('Falha ao remover o documento.')
     }
+  }
+
+  /**
+   * Verifica se o "id" informado é válido.
+   */
+  public validateId (id) {
+    return mongoose.Types.ObjectId.isValid(id)
   }
 
   /**
