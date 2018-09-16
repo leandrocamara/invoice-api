@@ -15,6 +15,9 @@
     > npm install
 
 ### Execução
+    # Inicializar o "MongoDB Database Server"
+    # Obs.: É possível iniciar o servidor por meio do "MongoDB Compass"
+
     # Executa as tarefas do Gulp (Typescript Transpiler)
     > npm run gulp
 
